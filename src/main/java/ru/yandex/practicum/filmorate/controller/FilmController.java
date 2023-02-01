@@ -1,8 +1,9 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import ru.yandex.practicum.filmorate.utilit.WarnAndThrowException;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.id.FilmId;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -24,20 +25,20 @@ public class FilmController {
     @PostMapping
     public Film create(@RequestBody Film film) {
         if (films.containsKey(film.getId())) {
-            logWarnAndThrowException("Фильм уже существует");
+            WarnAndThrowException.logWarnAndThrowException("Фильм уже существует");
         }
         if (film.getName().isEmpty() || film.getName() == null) {
-            logWarnAndThrowException("Название пустое");
+            WarnAndThrowException.logWarnAndThrowException("Название пустое");
         }
         if (film.getDescription().length() == 0 || film.getDescription().length() > 200) {
-            logWarnAndThrowException("Нет описания,или превышена длина (200 символов)");
+            WarnAndThrowException.logWarnAndThrowException("Нет описания,или превышена длина (200 символов)");
         }
         if (film.getReleaseDate().isBefore(FIRST_RELEASE_DATE)) {
-            logWarnAndThrowException("Дата релиза — не должна быть раньше 28 декабря 1895 года");
+            WarnAndThrowException.logWarnAndThrowException("Дата релиза — не должна быть раньше 28 декабря 1895 года");
         }
 
         if (film.getDuration() < 0 || film.getDuration() == 0 || film.getDuration() > 140) {
-            logWarnAndThrowException("Продолжительность фильма должна быть положительной");
+            WarnAndThrowException.logWarnAndThrowException("Продолжительность фильма должна быть положительной");
         }
         film.setId(filmId.getFilmId());
         log.info("Добавлен фильм: {}", film);
@@ -49,8 +50,23 @@ public class FilmController {
     @PutMapping
     public Film update(@RequestBody Film film) {
         if (!films.containsKey(film.getId())) {
-            logWarnAndThrowException("Фильм не существует");
+            WarnAndThrowException.logWarnAndThrowException("Фильм не существует");
         }
+        if (film.getName().isEmpty() || film.getName() == null) {
+            WarnAndThrowException.logWarnAndThrowException("Название пустое");
+        }
+
+        if (film.getDescription().length() == 0 || film.getDescription().length() > 200) {
+            WarnAndThrowException.logWarnAndThrowException("Нет описания,или превышена длина (200 символов)");
+        }
+        if (film.getReleaseDate().isBefore(FIRST_RELEASE_DATE)) {
+            WarnAndThrowException.logWarnAndThrowException("Дата релиза — не должна быть раньше 28 декабря 1895 года");
+        }
+
+        if (film.getDuration() < 0 || film.getDuration() == 0) {
+            WarnAndThrowException.logWarnAndThrowException("Продолжительность фильма должна быть положительной");
+        }
+
         log.info("Обновлен фильм: {}", film);
         films.put(film.getId(), film);
         return film;
@@ -66,8 +82,4 @@ public class FilmController {
         return films;
     }
 
-    private void logWarnAndThrowException(String message) {
-        log.warn(message);
-        throw new ValidationException(message);
-    }
 }
