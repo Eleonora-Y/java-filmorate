@@ -1,8 +1,0 @@
--------------------------------------------------------------------------------
-Test set: ru.yandex.practicum.filmorate.controller.UserControllerTest
--------------------------------------------------------------------------------
-Tests run: 7, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.063 s <<< FAILURE! - in ru.yandex.practicum.filmorate.controller.UserControllerTest
-createNewUserWithoutLogin  Time elapsed: 0.001 s  <<< FAILURE!
-org.opentest4j.AssertionFailedError: expected: <user1-login> but was: <>
-	at ru.yandex.practicum.filmorate.controller.UserControllerTest.createNewUserWithoutLogin(UserControllerTest.java:74)
-
