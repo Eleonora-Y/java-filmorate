@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import ru.yandex.practicum.filmorate.utilit.WarnAndThrowException;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.id.FilmId;
@@ -22,11 +21,8 @@ public class FilmController {
     private final FilmId filmId = new FilmId();
     private static final LocalDate FIRST_RELEASE_DATE = LocalDate.of(1895, Month.DECEMBER, 28);
 
-    @PostMapping
-    public Film create(@RequestBody Film film) {
-        if (films.containsKey(film.getId())) {
-            WarnAndThrowException.logWarnAndThrowException("Фильм уже существует");
-        }
+    public void validate(Film film) {
+
         if (film.getName().isEmpty() || film.getName() == null) {
             WarnAndThrowException.logWarnAndThrowException("Название пустое");
         }
@@ -37,9 +33,17 @@ public class FilmController {
             WarnAndThrowException.logWarnAndThrowException("Дата релиза — не должна быть раньше 28 декабря 1895 года");
         }
 
-        if (film.getDuration() < 0 || film.getDuration() == 0 || film.getDuration() > 140) {
+        if (film.getDuration() < 0 || film.getDuration() == 0) {
             WarnAndThrowException.logWarnAndThrowException("Продолжительность фильма должна быть положительной");
         }
+    }
+
+    @PostMapping
+    public Film create(@RequestBody Film film) {
+        if (films.containsKey(film.getId())) {
+            WarnAndThrowException.logWarnAndThrowException("Фильм уже существует");
+        }
+        validate(film);
         film.setId(filmId.getFilmId());
         log.info("Добавлен фильм: {}", film);
         films.put(film.getId(), film);
@@ -52,21 +56,7 @@ public class FilmController {
         if (!films.containsKey(film.getId())) {
             WarnAndThrowException.logWarnAndThrowException("Фильм не существует");
         }
-        if (film.getName().isEmpty() || film.getName() == null) {
-            WarnAndThrowException.logWarnAndThrowException("Название пустое");
-        }
-
-        if (film.getDescription().length() == 0 || film.getDescription().length() > 200) {
-            WarnAndThrowException.logWarnAndThrowException("Нет описания,или превышена длина (200 символов)");
-        }
-        if (film.getReleaseDate().isBefore(FIRST_RELEASE_DATE)) {
-            WarnAndThrowException.logWarnAndThrowException("Дата релиза — не должна быть раньше 28 декабря 1895 года");
-        }
-
-        if (film.getDuration() < 0 || film.getDuration() == 0) {
-            WarnAndThrowException.logWarnAndThrowException("Продолжительность фильма должна быть положительной");
-        }
-
+        validate(film);
         log.info("Обновлен фильм: {}", film);
         films.put(film.getId(), film);
         return film;

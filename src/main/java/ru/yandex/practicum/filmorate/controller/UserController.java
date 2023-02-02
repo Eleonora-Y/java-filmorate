@@ -21,13 +21,7 @@ public class UserController {
 
     private static final LocalDate loc = LocalDate.now();
 
-
-    @PostMapping()
-    public User create(@RequestBody User user) {
-
-        if (users.containsKey(user.getId())) {
-            WarnAndThrowException.logWarnAndThrowException("Пользователь уже существует");
-        }
+    public void validate(User user) {
 
         if (user.getEmail().isEmpty() ||
                 user.getEmail() == null ||
@@ -43,22 +37,24 @@ public class UserController {
             WarnAndThrowException.logWarnAndThrowException("Дата рождения указана неверно");
         }
 
+    }
+
+    @PostMapping()
+    public User create(@RequestBody User user) {
+
+        if (users.containsKey(user.getId())) {
+            WarnAndThrowException.logWarnAndThrowException("Пользователь уже существует");
+        }
+        validate(user);
         user.setId(userId.getUserId());
 
-        if (user.getName() == null) {
-            // if (user.getName().isEmpty() || user.getName() == null) {
+        if (user.getName() == null || user.getName().isEmpty()) {
             String a = user.getLogin();
             user.setName(a);
             users.put(user.getId(), user);
             log.info("Добавлен : {}", user);
         }
-        if (user.getName().isEmpty()) {
 
-            String a = user.getLogin();
-            user.setName(a);
-            users.put(user.getId(), user);
-            log.info("Добавлен : {}", user);
-        }
         users.put(user.getId(), user);
         log.info("Добавлен пользователь: {}", user);
         return user;
@@ -71,22 +67,11 @@ public class UserController {
             WarnAndThrowException.logWarnAndThrowException("Пользователь не существует");
         }
 
+
         if (user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
-        if (user.getEmail().isEmpty() ||
-                user.getEmail() == null ||
-                !user.getEmail().contains("@")) {
-            WarnAndThrowException.logWarnAndThrowException("Адрес эл. почты пустой или не хватает символа @");
-        }
-
-        if (user.getLogin().isBlank()) {
-            WarnAndThrowException.logWarnAndThrowException("Логин пустой или содержит пробелы");
-        }
-
-        if (user.getBirthday().isAfter(loc)) {
-            WarnAndThrowException.logWarnAndThrowException("Дата рождения указана неверно");
-        }
+        validate(user);
         log.info("Добавлен пользователь: {}", user);
         users.put(user.getId(), user);
 
