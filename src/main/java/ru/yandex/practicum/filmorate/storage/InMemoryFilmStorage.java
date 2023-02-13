@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.id.FilmId;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.utilit.WarnAndThrowException;
 
 import java.time.LocalDate;
@@ -90,14 +89,12 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (!films.containsKey(id)) {
             WarnAndThrowException.logAndThrowExceptionIfIdFilmNotExist(id);
         }
-        for (User user : userStorage.findAll()) {
-            if (user.getId() == userId) {
-                films.get(id).getLikes().add(userId);
-                log.info("Пользователь {} добавил лайк фильму {}",
-                        user.getName(),
-                        films.get(id).getName());
-                return;
-            }
+        if(userStorage.getUser(userId).getId()== userId){
+        films.get(id).getLikes().add(userId);
+        log.info("Пользователь {} добавил лайк фильму {}",
+                userStorage.getUser(userId).getName(),
+                films.get(id).getName());
+            return;
         }
         String message = String.format("Не существует пользователь с id=%d", userId);
         log.warn(message);
@@ -108,15 +105,14 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (!films.containsKey(id)) {
             WarnAndThrowException.logAndThrowExceptionIfIdFilmNotExist(id);
         }
-        for (User user : userStorage.findAll()) {
-            if (user.getId() == userId) {
+            if (userStorage.getUser(userId).getId() == userId) {
                 films.get(id).getLikes().remove(userId);
                 log.info("Пользователь {} удалил лайк фильму {}",
-                        user.getName(),
+                        userStorage.getUser(userId).getName(),
                         films.get(id).getName());
                 return;
             }
-        }
+
         String message = String.format("Не существует пользователь с id=%d", userId);
         log.warn(message);
         throw new ObjectNotFoundException(message);

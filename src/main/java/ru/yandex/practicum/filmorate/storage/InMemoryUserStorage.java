@@ -25,19 +25,16 @@ public class InMemoryUserStorage implements UserStorage {
             String message = "Адрес эл. почты пустой или не хватает символа @";
             log.warn(message);
             throw new ValidationException(message);
-            //  WarnAndThrowException.logWarnAndThrowException("Адрес эл. почты пустой или не хватает символа @");
         }
         if (user.getLogin().isBlank()) {
             String message = "Логин пустой или содержит пробелы";
             log.warn(message);
             throw new ValidationException(message);
-         //   WarnAndThrowException.logWarnAndThrowException("Логин пустой или содержит пробелы");
         }
         if (user.getBirthday().isAfter(LocalDate.now())) {
             String message = "Дата рождения указана неверно";
             log.warn(message);
             throw new ValidationException(message);
-         //   WarnAndThrowException.logWarnAndThrowException("Дата рождения указана неверно");
         }
     }
 
@@ -47,7 +44,6 @@ public class InMemoryUserStorage implements UserStorage {
             String message = String.format("Пользователь существует: %s", user.getName());
             log.warn(message);
             throw new ValidationException(message);
-         //   WarnAndThrowException.logWarnAndThrowException("Пользователь уже существует");
         }
         validate(user);
         user.setId(id.getUserId());
