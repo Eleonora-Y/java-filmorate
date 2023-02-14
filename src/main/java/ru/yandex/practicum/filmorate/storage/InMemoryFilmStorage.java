@@ -23,6 +23,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     private final FilmId filmId = new FilmId();
     private static final LocalDate FIRST_RELEASE_DATE = LocalDate.of(1895, Month.DECEMBER, 28);
     private final UserStorage userStorage;
+    private  String nameUser;
 
     @Autowired
     public InMemoryFilmStorage(UserStorage userStorage) {
@@ -88,34 +89,29 @@ public class InMemoryFilmStorage implements FilmStorage {
     public void addLike(Long id, Long userId) {
         if (!films.containsKey(id)) {
             WarnAndThrowException.logAndThrowExceptionIfIdFilmNotExist(id);
+            String message = String.format("Не существует пользователь с id=%d", userId);
+            log.warn(message);
+            throw new ObjectNotFoundException(message);
         }
-        if(userStorage.getUser(userId).getId()== userId){
+        nameUser=userStorage.getUser(userId).getName();
         films.get(id).getLikes().add(userId);
         log.info("Пользователь {} добавил лайк фильму {}",
-                userStorage.getUser(userId).getName(),
+                nameUser,
                 films.get(id).getName());
-            return;
-        }
-        String message = String.format("Не существует пользователь с id=%d", userId);
-        log.warn(message);
-        throw new ObjectNotFoundException(message);
     }
 
     public void removeLike(Long id, Long userId) {
         if (!films.containsKey(id)) {
             WarnAndThrowException.logAndThrowExceptionIfIdFilmNotExist(id);
+            String message = String.format("Не существует пользователь с id=%d", userId);
+            log.warn(message);
+            throw new ObjectNotFoundException(message);
         }
-            if (userStorage.getUser(userId).getId() == userId) {
+                nameUser=userStorage.getUser(userId).getName();
                 films.get(id).getLikes().remove(userId);
                 log.info("Пользователь {} удалил лайк фильму {}",
-                        userStorage.getUser(userId).getName(),
+                        nameUser,
                         films.get(id).getName());
-                return;
-            }
-
-        String message = String.format("Не существует пользователь с id=%d", userId);
-        log.warn(message);
-        throw new ObjectNotFoundException(message);
     }
 
     public List<Film> getPopularFilms(Long count) {

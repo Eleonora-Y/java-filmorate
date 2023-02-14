@@ -16,6 +16,8 @@ import java.util.*;
 public class InMemoryUserStorage implements UserStorage {
     private final Map<Long, User> users = new HashMap<>();
     private final UserId id = new UserId();
+    private String nameUser;
+    private String nameUserFriend;
 
     public void validate(User user) {
         if (user.getEmail().isEmpty() ||
@@ -102,11 +104,13 @@ public class InMemoryUserStorage implements UserStorage {
         if (!users.containsKey(friendId)) {
             WarnAndThrowException.logAndThrowExceptionIfIdFilmNotExist(friendId);
         }
+        nameUserFriend=users.get(friendId).getName();
+        nameUser= users.get(userId).getName();
         users.get(userId).getFriendsId().add(friendId);
         users.get(friendId).getFriendsId().add(userId);
         log.info("Пользователь {} добавлен в друзья пользователю {}",
-                users.get(friendId).getName(),
-                users.get(userId).getName());
+                nameUserFriend,
+                nameUser);
     }
 
     @Override
@@ -117,11 +121,13 @@ public class InMemoryUserStorage implements UserStorage {
         if (!users.containsKey(friendId)) {
             WarnAndThrowException.logAndThrowExceptionIfIdFilmNotExist(friendId);
         }
+        nameUserFriend=users.get(friendId).getName();
+        nameUser= users.get(userId).getName();
         users.get(userId).getFriendsId().remove(friendId);
         users.get(friendId).getFriendsId().remove(userId);
         log.info("Пользователь {} удален из друзей пользователя {}",
-                users.get(friendId).getName(),
-                users.get(userId).getName());
+                nameUserFriend,
+                nameUser);
     }
 
     @Override
