@@ -16,8 +16,6 @@ import java.util.*;
 public class InMemoryUserStorage implements UserStorage {
     private final Map<Long, User> users = new HashMap<>();
     private final UserId id = new UserId();
-    private String nameUser;
-    private String nameUserFriend;
 
     public void validate(User user) {
         if (user.getEmail().isEmpty() ||
@@ -104,13 +102,14 @@ public class InMemoryUserStorage implements UserStorage {
         if (!users.containsKey(friendId)) {
             WarnAndThrowException.logAndThrowExceptionIfIdFilmNotExist(friendId);
         }
-        nameUserFriend=users.get(friendId).getName();
-        nameUser= users.get(userId).getName();
-        users.get(userId).getFriendsId().add(friendId);
-        users.get(friendId).getFriendsId().add(userId);
+        User userFriend = users.get(friendId);
+        User user=users.get(userId);
+        user.getFriendsId().add(friendId);
+        userFriend.getFriendsId().add(userId);
+
         log.info("Пользователь {} добавлен в друзья пользователю {}",
-                nameUserFriend,
-                nameUser);
+                userFriend.getName(),
+                user.getName());
     }
 
     @Override
@@ -121,13 +120,15 @@ public class InMemoryUserStorage implements UserStorage {
         if (!users.containsKey(friendId)) {
             WarnAndThrowException.logAndThrowExceptionIfIdFilmNotExist(friendId);
         }
-        nameUserFriend=users.get(friendId).getName();
-        nameUser= users.get(userId).getName();
-        users.get(userId).getFriendsId().remove(friendId);
-        users.get(friendId).getFriendsId().remove(userId);
+        User userFriend = users.get(friendId);
+        User user=users.get(userId);
+        user.getFriendsId().remove(friendId);
+        userFriend.getFriendsId().remove(userId);
+
         log.info("Пользователь {} удален из друзей пользователя {}",
-                nameUserFriend,
-                nameUser);
+                userFriend.getName(),
+                user.getName());
+
     }
 
     @Override
