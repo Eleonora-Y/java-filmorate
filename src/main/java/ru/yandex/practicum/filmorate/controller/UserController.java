@@ -1,89 +1,60 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import ru.yandex.practicum.filmorate.utilit.WarnAndThrowException;
-
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.id.UserId;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
-import java.time.LocalDate;
-import java.util.*;
+import java.util.List;
 
+@Component
 @RestController
-@RequestMapping("/users")
-@Slf4j
-@Data
 public class UserController {
-    private final Map<Integer, User> users = new HashMap<>();
-    private final UserId userId = new UserId();
+    private final UserService userService;
 
-    private static final LocalDate loc = LocalDate.now();
-
-    public void validate(User user) {
-
-        if (user.getEmail().isEmpty() ||
-                user.getEmail() == null ||
-                !user.getEmail().contains("@")) {
-            WarnAndThrowException.logWarnAndThrowException("Адрес эл. почты пустой или не хватает символа @");
-        }
-
-        if (user.getLogin().isBlank()) {
-            WarnAndThrowException.logWarnAndThrowException("Логин пустой или содержит пробелы");
-        }
-
-        if (user.getBirthday().isAfter(loc)) {
-            WarnAndThrowException.logWarnAndThrowException("Дата рождения указана неверно");
-        }
-
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
-    @PostMapping()
+
+    @PostMapping("/users")
     public User create(@RequestBody User user) {
-
-        if (users.containsKey(user.getId())) {
-            WarnAndThrowException.logWarnAndThrowException("Пользователь уже существует");
-        }
-        validate(user);
-        user.setId(userId.getUserId());
-
-        if (user.getName() == null || user.getName().isEmpty()) {
-            String a = user.getLogin();
-            user.setName(a);
-            users.put(user.getId(), user);
-            log.info("Добавлен : {}", user);
-        }
-
-        users.put(user.getId(), user);
-        log.info("Добавлен пользователь: {}", user);
-        return user;
+        return userService.create(user);
     }
 
-
-    @PutMapping()
+    @PutMapping("/users")
     public User update(@RequestBody User user) {
-        if (!users.containsKey(user.getId())) {
-            WarnAndThrowException.logWarnAndThrowException("Пользователь не существует");
-        }
-
-
-        if (user.getName().isEmpty()) {
-            user.setName(user.getLogin());
-        }
-        validate(user);
-        log.info("Добавлен пользователь: {}", user);
-        users.put(user.getId(), user);
-
-        return user;
+        return userService.update(user);
     }
 
-    @GetMapping()
-    public List<User> getAll() {
-        log.info("Текущее количество пользователей: {}", users.size());
-        return new ArrayList<>(users.values());
+    @GetMapping("/users")
+    public List<User> findAll() {
+        return userService.findAll();
+    }
+    @GetMapping("/users/{id}")
+    public User getUser(@PathVariable long id) {
+        return userService.getUser(id);
     }
 
+    @PutMapping("/users/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable long id, @PathVariable long friendId) {
+        userService.addFriend(id, friendId);
+    }
 
+    @DeleteMapping("/users/{id}/friends/{friendId}")
+    public void deleteFriend(@PathVariable long id, @PathVariable long friendId) {
+        userService.removeFriend(id, friendId);
+    }
+
+    @GetMapping("/users/{id}/friends")
+    public List<User> getFriends(@PathVariable long id) {
+        return userService.getFriends(id);
+    }
+
+    @GetMapping("/users/{id}/friends/common/{otherId}")
+    public List<User> getCommonFriends(@PathVariable long id, @PathVariable long otherId) {
+        return userService.getCommonFriends(id, otherId);
+    }
 }
-
