@@ -1,2 +1,2 @@
 
-https://github.com/Eleonora-Y/java-filmorate/blob/main/db-filmorate.png
+![db-filmorate.png](https://raw.githubusercontent.com/Eleonora-Y/java-filmorate/main/db-filmorate.png)
