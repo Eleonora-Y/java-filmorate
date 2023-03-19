@@ -37,6 +37,8 @@ public class GenreService {
             );
             log.info("Genre found = {} ", genre);
             return genre;
-        } else throw new ObjectNotFoundException(String.format("Genre not found: id=%d", id));
+        } else {
+            throw new ObjectNotFoundException(String.format("Genre not found: id=%d", id));
+        }
     }
 }

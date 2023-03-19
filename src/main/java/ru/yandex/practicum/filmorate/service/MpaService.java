@@ -37,6 +37,8 @@ public class MpaService {
             );
             log.info("Mpa found: {}", mpa);
             return mpa;
-        } else throw new ObjectNotFoundException(String.format("Mpa not found: id=%d", id));
+        } else {
+            throw new ObjectNotFoundException(String.format("Mpa not found: id=%d", id));
+        }
     }
 }
